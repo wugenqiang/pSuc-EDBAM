@@ -52,7 +52,7 @@ for seq_i in SeqIO.parse(sequences_need_predict_fasta, 'fasta'):
 
     for i in range(len(y_pred)):
         if y_pred[i] >= 0.5:
-            k_index_pred_true.append(k_index[i] + 1) # 位置：索引值+1
+            k_index_pred_true.append(k_index[i]) 
 
     num_k_index_pred_true = len(k_index_pred_true)  # 预测为真实值的个数
     print(k_index_pred_true, num_k_index_pred_true)
