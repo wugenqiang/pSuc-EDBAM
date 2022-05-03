@@ -51,84 +51,33 @@ def getSequence(sequence,num):
 
     return targetStrList
 
-def get_positive_negative_samples(data, window_size = 31):
-
-    length = len(data)
-    positive_data = []
-    negative_data = []
-
-    '''
-    zip()函数：用于将可迭代的对象作为参数，将对象中对应的元素打包成一个个元组，然后返回由这些元组组成的列表。
-    简而言之，打包为元组的列表
-    '''
-    for i, j in zip(range(0, length, 2), range(1, length, 2)):
-        # print(i, j)
-        # example: >PLMD-31|O00232|#405#98 >sp|P0ADE6|	#24	#129	#8	#102	#133	#137
-        name = data.iloc[i, 0]
-        # print(name)
-        # 匹配右侧'|'
-        r_index = name.rfind('|')
-        # print(r_index)
-        # 获取plmd_id
-        plmd_id = name[1: r_index]
-        # print(plmd_id)
-        # 以'#'号分离，获取位点position_index列表
-        name_index = name.split('#')[0]
-        # print(name_index)
-        position_index_list = name.split('#')[1:]
-        # print(position_index_list)
-        # 将str转换为int型
-        position_index_list_int = []
-        for position_index in position_index_list:
-            position_index_list_int.append(int(position_index))
-        # print(position_index_list_int)
-        sequence = data.iloc[j, 0]
-        # print(sequence)
-        # 以K为中心，上下窗口为31，num=15， 切分sequence
-        num = window_size // 2
-        get_cut_Sequence = getSequence(sequence, num)
-        # print(get_cut_Sequence)
-
-        # 获取序列索引
-        for index, value in get_cut_Sequence.items():
-            # print(index, value)
-            # index = str(index)
-            if index in position_index_list_int:
-                positive_data.append(name_index + '#' + str(index))
-                positive_data.append(value)
-            else:
-                negative_data.append(name_index + '#' + str(index))
-                negative_data.append(value)
-
-    return positive_data, negative_data
-
-def get_sequence_samples(data, window_size = 31):
-
-    length = len(data)
+def get_sequence_samples(Seq_i, window_size):
+    """
+    处理单条序列数据,将单条数据进行切片，返回切片序列和修饰位点在序列中的索引
+    :param Seq_i(str):去掉序列标题的纯蛋白质序列
+    :return B(list):切片好的序列
+            index_i(list):K的位置索引
+    """
+    Seq = Seq_i
+    aminodata = str(Seq)
+    left_window_size = window_size // 2
     sequences = []
-
-    for i, j in zip(range(0, length, 2), range(1, length, 2)):
-        # print(i, j)
-        # example: >PLMD-31|O00232|#405#98 >sp|P0ADE6|	#24	#129	#8	#102	#133	#137
-        name = data.iloc[i, 0]
-        # print(name)
-        # 以'#'号分离，获取位点position_index列表
-        name_index = name.split('#')[0]
-
-        # print(sequence)
-        # 以K为中心，上下窗口为31，num=15， 切分sequence
-        num = window_size // 2
-        get_cut_Sequence = getSequence(data.iloc[j, 0], num)
-        # print(get_cut_Sequence)
-
-        # 获取序列索引
-        for index, value in get_cut_Sequence.items():
-            # print(index, value)
-            # index = str(index)
-            sequences.append(name_index + '#' + str(index))
-            sequences.append(value)
-
-    return sequences
+    indexi = []
+    for r in range(len(aminodata)):
+        if aminodata[r] == 'K':
+            indexi.append(r)
+            if len(aminodata[r+1:]) < left_window_size:  # 判断右边长度是否小于left_window_size
+                aminovecR = aminodata[r:] + 'X' * (left_window_size - len(aminodata[r + 1:]))
+                aminovecL = aminodata[r - left_window_size:r]
+            elif len(aminodata[:r]) < left_window_size:  # 判断前面长度是否小于left_window_size
+                aminovecL = 'X' * (left_window_size - len(aminodata[:r])) + aminodata[:r]
+                aminovecR = aminodata[r:r + left_window_size + 1]
+            else:  # 正常情况
+                aminovecL = aminodata[r - left_window_size:r]
+                aminovecR = aminodata[r:r + left_window_size + 1]
+            aminovec = aminovecL + aminovecR
+            sequences.append(aminovec)
+    return sequences, indexi
 
 def readFasta(file):
 
@@ -150,17 +99,11 @@ def readFasta(file):
 # 对序列进行镜像填补处理
 def mirror_image(train):
     # mirror images
-    # for i in range(train.shape[0])
     train_new = []
     for seq in train:
         for i in range(len(seq)):
             if seq[i] == 'X':
-                # seq = seq.replace('X', seq[len(seq)-1-i])
                 seq = seq[:i] + seq[len(seq)-1-i] + seq[i+1:]
-                # print(seq)
-                # seq[i] = seq[len(seq)-1-i]
         train_new.append(seq)
-    # train_new
-    # train = pd.DataFrame(train_new, columns=['sequence'])
     return train_new
 
