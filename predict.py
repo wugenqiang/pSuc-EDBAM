@@ -26,12 +26,12 @@ from utils.sequence_preprocessing import readFasta, mirror_image, get_sequence_s
 2.对切分好的序列数据进行镜像填充处理
 
 '''
-# Step 1: 根据窗口大小切分数据, window size = 31
 window_size = 31 # 序列窗口大小设置为31
 sequences_need_predict_fasta = 'example/sequences_need_to_be_predicted_example.fasta' # 待预测序列
 
 for seq_i in SeqIO.parse(sequences_need_predict_fasta, 'fasta'):
     print(seq_i)
+    # Step 1: 根据窗口大小切分数据, window size = 31
     sequences, k_index = get_sequence_samples(seq_i.seq, window_size)  # 对待预测序列进行切分
     # print(sequences, k_index)
     # Step 2: 对序列进行镜像处理
