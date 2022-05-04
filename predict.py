@@ -25,13 +25,22 @@ from utils.sequence_preprocessing import mirror_image, get_sequence_samples
 3.特征提取
 4.加载模型
 5.得到预测值
+6.用字典存储预测数据
+7.将预测数据写入csv文件
 
 '''
+
+import numpy as np
+import pandas as pd
+
 window_size = 31 # 序列窗口大小设置为31
 sequences_need_predict_fasta = 'example/sequences_need_to_be_predicted_example.fasta' # 待预测序列
 
+pre_site = [] # 预测为琥珀酰化位点的k的位置列表
+count = 0 # 预测蛋白质序列条数
+
 for seq_i in SeqIO.parse(sequences_need_predict_fasta, 'fasta'):
-    print(seq_i)
+    # print(seq_i)
     # Step 1: 根据窗口大小切分数据, window size = 31
     sequences, k_index = get_sequence_samples(seq_i.seq, window_size)  # 对待预测序列进行切分
     # print(sequences, k_index)
@@ -57,6 +66,24 @@ for seq_i in SeqIO.parse(sequences_need_predict_fasta, 'fasta'):
             k_index_pred_true.append(k_index[i])
 
     num_k_index_pred_true = len(k_index_pred_true)  # 预测为真实值的个数
-    print(k_index_pred_true, num_k_index_pred_true)
+    # print(k_index_pred_true, num_k_index_pred_true)
+
+    k_loc_pred_true = [loc+1 for loc in k_index_pred_true] # 预测为真实值的k的位置
+    # print(k_loc_pred_true)
+
+    # Step 6: 用字典存储预测数据
+    content = {
+        'number': count,
+        'name': seq_i.name,
+        'sequence': seq_i.seq,
+        'pre_site': k_loc_pred_true,
+    }
+    count += 1
+    pre_site.append(content)
+    print(content)
+
+# Step 7: 将预测数据写入csv文件
+pd.DataFrame(pre_site).to_csv('result/predict_result/example_pre_site.csv', index=False)
+
 
 
