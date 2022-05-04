@@ -13,8 +13,8 @@
 
 import numpy as np
 
-# 说明： one of K编码
-# 输入： data
+# 说明： One Hot 编码
+# 输入： data, windows
 # 输出： data_X, data_Y
 def one_hot(data, windows=31):
     # define input string
