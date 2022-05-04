@@ -20,10 +20,13 @@ from utils.feature_extraction import one_hot
 from utils.sequence_preprocessing import readFasta, mirror_image, get_sequence_samples
 
 '''
-处理example中fasta格式的数据
+处理example中fasta格式的数据并进行位点预测
 步骤如下：
 1.根据窗口大小切分待预测数据
 2.对切分好的序列数据进行镜像填充处理
+3.特征提取
+4.加载模型
+5.得到预测值
 
 '''
 window_size = 31 # 序列窗口大小设置为31
@@ -38,21 +41,22 @@ for seq_i in SeqIO.parse(sequences_need_predict_fasta, 'fasta'):
     sequences = mirror_image(sequences)
     # print(sequences)
 
-    # 特征提取
+    # Step 3: 特征提取
     sequence_feature = one_hot(sequences, window_size)  # one hot
 
-    # 载入模型
+    # Step 4: 加载模型
     model = load_model('models/pSuc-EDBAM_model.h5')
-    # 预测概率值
+
+    # Step 5: 得到预测值
     sequences_pred = model.predict(sequence_feature, verbose=1)
     # print(sequences_pred[:, 1])
-    y_pred = sequences_pred[:, 1]
+    y_pred = sequences_pred[:, 1] # 预测概率值
 
     k_index_pred_true = []  # 预测为真实值的索引
 
     for i in range(len(y_pred)):
         if y_pred[i] >= 0.5:
-            k_index_pred_true.append(k_index[i]) 
+            k_index_pred_true.append(k_index[i])
 
     num_k_index_pred_true = len(k_index_pred_true)  # 预测为真实值的个数
     print(k_index_pred_true, num_k_index_pred_true)
