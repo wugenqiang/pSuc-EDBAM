@@ -17,7 +17,7 @@ from keras.models import load_model
 from Bio import SeqIO # pip install biopython # 导入SeqIO模块
 
 from utils.feature_extraction import one_hot
-from utils.sequence_preprocessing import readFasta, mirror_image, get_sequence_samples
+from utils.sequence_preprocessing import mirror_image, get_sequence_samples
 
 '''
 处理example中fasta格式的数据并进行位点预测
