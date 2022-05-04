@@ -11,8 +11,6 @@ The model to predict the succinylation sites.
 
 """
 
-import numpy as np
-import pandas as pd
 from keras.models import load_model
 from Bio import SeqIO # pip install biopython # 导入SeqIO模块
 

@@ -11,12 +11,7 @@
 
 """
 
-import pandas as pd
 import numpy as np
-# 忽略提醒
-import warnings
-
-warnings.filterwarnings("ignore")
 
 # 说明： one of K编码
 # 输入： data
