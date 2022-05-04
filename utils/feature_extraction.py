@@ -42,6 +42,3 @@ def one_hot(data, windows=31):
             j = j + 1
 
     return data_X
-
-# train_data = pd.read_csv('example/training/train_data.csv')
-# # print(train_data['sequence'])
